@@ -98,7 +98,7 @@ helm:
       # Username if authenticating to ES with basic auth
       username: "elastic"
       # Password if authenticating to ES with basic auth
-      password: "15O3S7MYm723C8Dhuu60cTib"
+      password: "UKe4z0GY21Bp44Ln34RvF0C3"
       # Specifies an existing secret to be used for the ES username/password
       credentialsSecret: ""
       # The key in elasticsearch.credentialsSecret that stores the ES password
