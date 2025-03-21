@@ -85,7 +85,7 @@ helm:
     - name: ES_USERNAME
       value: "elastic"
     - name: ES_PASSWORD
-      value: "UKe4z0GY21Bp44Ln34RvF0C3"
+      value: "12VVU05Y1P8Bl09Jvj92VWUj"
     # podAnnotations -- Set annotations on Vector Pods.
     podAnnotations: {}
 
