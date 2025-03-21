@@ -23,7 +23,7 @@ spec:
         - |
           apk add --no-cache curl
           while true; do 
-            echo "{\"@timestamp\":\"2025-03-20T16:34:36.323Z\",\"ecs.version\":\"8.10.0\",\"log.level\":\"error\",\"message\":\"Tentative connexion RD\",\"stack\":[{\"action\":{},\"flag\":\"PROBANT\",\"responsible\":{\"ip\":\"1.2.3.4\",\"userAgent\":\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36\",\"userEmail\":\"USER1@TEST1.fr\"},\"status\":\"FAIL\"},{\"action\":{},\"flag\":\"PROBANT\",\"responsible\":{\"ip\":\"9.8.7.6\",\"userAgent\":\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36\",\"userEmail\":\"USER2@TEST2.fr\"},\"status\":\"FAIL\"}]}"
+            echo "{\"timestamp\":\"2025-03-20T16:34:36.323Z\",\"ecs.version\":\"8.10.0\",\"log.level\":\"error\",\"message\":\"Tentative connexion RD\",\"stack\":[{\"action\":{},\"flag\":\"PROBANT\",\"responsible\":{\"ip\":\"1.2.3.4\",\"userAgent\":\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36\",\"userEmail\":\"USER1@TEST1.fr\"},\"status\":\"FAIL\"},{\"action\":{},\"flag\":\"PROBANT\",\"responsible\":{\"ip\":\"9.8.7.6\",\"userAgent\":\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36\",\"userEmail\":\"USER2@TEST2.fr\"},\"status\":\"FAIL\"}]}"
             #echo "{\"log_level\": \"info\", \"message\": \"alpine-sample-log\"}" >&1;
             sleep 30;  # Réduction du temps d'attente
           done
