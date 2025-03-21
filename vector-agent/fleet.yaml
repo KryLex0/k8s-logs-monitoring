@@ -213,7 +213,7 @@ helm:
             user: "${ES_USERNAME}"
             password: "${ES_PASSWORD}"
           bulk:
-            index: "hdh-logs-%Y-%m-%d"
+            index: "k8s-logs-%Y-%m-%d"
             action: "index"
           compression: gzip
 
