@@ -1,1 +1,6 @@
 defaultNamespace: elk
+
+dependsOn:
+- selector:
+    matchLabels:
+      bundleName: eck-operator
