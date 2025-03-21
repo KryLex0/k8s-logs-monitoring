@@ -9,7 +9,7 @@ metadata:
   name: elasticsearch
   namespace: elastic-system
 spec:
-  version: 8.14.3
+  version: 8.17.3
   http:
     service:
       spec:
