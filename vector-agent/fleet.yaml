@@ -1,0 +1,320 @@
+defaultNamespace: vector-agent
+
+# labels:
+#   bundleName: vector
+
+# Custom helm options
+helm:
+  disablePreProcess: true
+  # The release name to use. If empty a generated release name will be used
+  releaseName: vector
+
+  # The directory of the chart in the repo.  Also any valid go-getter supported
+  # URL can be used there is specify where to download the chart from.
+  # If repo below is set this value if the chart name in the repo
+  chart: vector
+
+  # An https to a valid Helm repository to download the chart from
+  repo: https://helm.vector.dev
+
+  # Used if repo is set to look up the version of the chart
+  version: "0.41.0"
+
+  # Force recreate resource that can not be updated
+  force: false
+
+  # How long for helm to wait for the release to be active. If the value
+  # is less that or equal to zero, we will not wait in Helm
+  timeoutSeconds: 0
+
+  values:
+    # See Vector helm documentation to learn more:
+    # https://vector.dev/docs/setup/installation/package-managers/helm/
+
+    # role -- [Role](https://vector.dev/docs/setup/deployment/roles/) for this Vector instance, valid options are:
+    # "Agent", "Aggregator", and "Stateless-Aggregator".
+
+    # Each role is created with the following workloads:
+    # Agent = DaemonSet
+    # Aggregator = StatefulSet
+    # Stateless-Aggregator = Deployment
+    role: "Agent"
+
+    # commonLabels -- Add additional labels to all created resources.
+    commonLabels: {}
+
+    # Define the Vector image to use.
+    # image:
+    #   # image.repository -- Override default registry and name for Vector's image.
+    #   repository: timberio/vector
+    #   # image.pullPolicy -- The [pullPolicy](https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy) for
+    #   # Vector's image.
+    #   pullPolicy: IfNotPresent
+    #   # image.pullSecrets -- The [imagePullSecrets](https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod)
+    #   # to reference for the Vector Pods.
+    #   pullSecrets: []
+    #   # image.tag -- The tag to use for Vector's image.
+    #   # @default -- Derived from the Chart's appVersion.
+    #   tag: ""
+    #   # image.sha -- The SHA to use for Vector's image.
+    #   sha: ""
+    #   # image.base -- The base distribution to use for vector. If set, then the base in appVersion will be replaced with this base alongside the version.
+    #   # For example: with a `base` of `debian` `0.38.0-distroless-libc` becomes `0.38.0-debian`
+    #   base: ""
+
+
+    # Adding additional entries with hostAliases
+    # hostAliases: []
+    # - ip: "127.0.0.1"
+    #   hostnames:
+    #   - "foo.local"
+    #   - "bar.local"
+
+
+    # # Create a Secret resource for Vector to use.
+    # secrets:
+    #   # secrets.generic -- Each Key/Value will be added to the Secret's data key, each value should be raw and NOT base64
+    #   # encoded. Any secrets can be provided here. It's commonly used for credentials and other access related values.
+    #   # **NOTE: Don't commit unencrypted secrets to git!**
+    #   generic: {}
+    #     # my_variable: "my-secret-value"
+    #     # datadog_api_key: "api-key"
+    #     # awsAccessKeyId: "access-key"
+    #     # awsSecretAccessKey: "secret-access-key"
+    env:
+    - name: ES_USERNAME
+      value: "elastic"
+    - name: ES_PASSWORD
+      value: "15O3S7MYm723C8Dhuu60cTib"
+    # podAnnotations -- Set annotations on Vector Pods.
+    podAnnotations: {}
+
+    # podLabels -- Set labels on Vector Pods.
+    podLabels:
+      vector.dev/exclude: "true"
+
+    # podHostNetwork -- Configure hostNetwork on Vector Pods.
+    podHostNetwork: false
+
+    # # args -- Override Vector's default arguments.
+    # args:
+    #   - --config-dir
+    #   - "/etc/vector/"
+
+
+    # resources -- Set Vector resource requests and limits.
+    resources:
+      requests:
+        cpu: 200m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 1024Mi
+
+    # # tolerations -- Configure Vector Pods to be scheduled on [tainted](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+    # # nodes.
+    # tolerations: []
+
+    # # affinity -- Configure [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+    # # rules for Vector Pods.
+    # affinity: {}
+
+    # # topologySpreadConstraints -- Configure [topology spread constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/)
+    # # for Vector Pods. Valid for the "Aggregator" and "Stateless-Aggregator" roles.
+    # topologySpreadConstraints: []
+
+    # Configuration for Vector's Service. @TSI: ENABLE FOR metrics exposure. (e.g. to replace nodeexporter)
+    service:
+      # service.enabled -- If true, create and provide a Service resource for Vector.
+      enabled: false
+      # service.type -- Set the type for Vector's Service.
+      type: "ClusterIP"
+
+    # Configuration for Vector's Headless Service.
+    serviceHeadless:
+      # serviceHeadless.enabled -- If true, create and provide a Headless Service resource for Vector.
+      enabled: false
+
+    # customConfig -- Override Vector's default configs, if used **all** options need to be specified. This section supports
+    # using helm templates to populate dynamic values. See Vector's [configuration documentation](https://vector.dev/docs/reference/configuration/)
+    # for all options.
+    customConfig:
+      # api:
+      #   enabled: false
+      #   # address: 127.0.0.1:8686
+      #   # playground: false
+      sources:
+        # demo_logs:
+        #   count: 30
+        #   type: demo_logs
+        #   format: json
+        #   interval: 10
+        k8s:
+          type: kubernetes_logs
+          timezone: "local"
+
+      transforms:
+        processed_logs:
+          type: remap
+          inputs:
+          - k8s
+          source: |
+            del(.kubernetes.pod_labels.app)
+            .tmstamp = now() 
+            # Parse the .message field
+            if is_object(.message) {
+              .message = parse_json!(encode_json(.message))
+            }
+            message_value, err = parse_json(.message)
+            if err == null {
+              .debug = .message
+              .message = message_value
+
+            } else {
+              .message = { "raw": .message }
+            }
+
+            # Process the message.stack field, assuming always exactly one element
+            if exists(.message.stack) && is_array(.message.stack) {
+              # Create new fields for each element in the stack array and merge them into the message object
+              new_fields = {}
+              # check if the stack field is an array and has more than one element
+              if length!(.message.stack) > 0 {
+
+                for_each(array!(.message.stack)) -> |index, value| {
+                    new_value = value
+                    if is_object(value) {
+                        new_value = parse_json!(encode_json(value))
+                    } else {
+                        new_value = { "raw": value }
+                    }
+                    new_fields = set!(new_fields, ["stack_" + to_string(index)], value)
+                }
+
+                .message = merge!(.message, new_fields)
+              }
+              .has_stack = true
+            }
+      sinks:
+        elastic:
+          type: elasticsearch
+          inputs:
+          # - k8s
+          - processed_logs
+          endpoints:
+          - "https://10.0.5.13:31111"
+          tls:
+            verify_certificate: false
+            verify_hostname: false
+          # v8
+          api_version: auto
+          auth:
+            strategy: "basic"
+            user: "${ES_USERNAME}"
+            password: "${ES_PASSWORD}"
+          bulk:
+            index: "hdh-logs-%Y-%m-%d"
+            action: "index"
+          compression: gzip
+
+        stdout:
+          type: console
+          inputs:
+          - k8s
+          target: stdout
+          encoding:
+            codec: raw_message
+
+    # defaultVolumes -- Default volumes that are mounted into pods. In most cases, these should not be changed.
+    # Use `extraVolumes`/`extraVolumeMounts` for additional custom volumes.
+    # @default -- See `values.yaml`
+    defaultVolumes:
+    - name: var-log
+      hostPath:
+        path: "/var/log/"
+    - name: var-lib
+      hostPath:
+        path: "/var/lib/"
+    - name: vector-data
+      hostPath:
+        path: "/var/lib/vector"
+    # @TSI: for host_metrics    
+    # - name: procfs
+    #   hostPath:
+    #     path: "/proc"
+    # - name: sysfs
+    #   hostPath:
+    #     path: "/sys"
+
+    # defaultVolumeMounts -- Default volume mounts. Corresponds to `volumes`.
+    # @default -- See `values.yaml`
+
+    defaultVolumeMounts:
+    - name: var-log
+      mountPath: "/var/log/"
+      readOnly: true
+    - name: var-lib
+      mountPath: "/var/lib"
+      readOnly: true
+    # - name: procfs
+    #   mountPath: "/host/proc"
+    #   readOnly: true
+    # - name: sysfs
+    #   mountPath: "/host/sys"
+    #   readOnly: true
+    - name: vector-data
+      mountPath: "/var/lib/vector"
+      readOnly: false
+    # # extraVolumes -- Additional Volumes to use with Vector Pods.
+    # extraVolumes: []
+
+    # # extraVolumeMounts -- Additional Volume to mount into Vector Containers.
+    # extraVolumeMounts: []
+
+
+    # Configuration for Vector's data persistence.
+    persistence:
+      hostPath:
+        # persistence.hostPath.enabled -- If true, use hostPath persistence. Valid for the "Agent" role, if it's disabled
+        # the "Agent" role will use emptyDir.
+        enabled: true
+        # persistence.hostPath.path -- Override path used for hostPath persistence. Valid for the "Agent" role, persistence
+        # is always used for the "Agent" role.
+        path: "/var/lib/vector"
+        #@TSI: Generally, no manual intervention or scheduled clearance is needed.
+        # Typically, the internal state storage is minimal—it’s usually small in size - 1-2Gb of the disk space.
+
+
+
+        # Configure a PodMonitor for Vector, requires the PodMonitor CRD to be installed.
+    podMonitor:
+      # podMonitor.enabled -- If true, create a PodMonitor for Vector.
+      enabled: false
+      # podMonitor.jobLabel -- Override the label to retrieve the job name from.
+      jobLabel: app.kubernetes.io/name
+      # podMonitor.port -- Override the port to scrape.
+      port: prom-exporter
+      # podMonitor.path -- Override the path to scrape.
+      path: /metrics
+      # podMonitor.interval -- Override the interval at which metrics should be scraped.
+      interval: # podMonitor.scrapeTimeout -- Override the timeout after which the scrape is ended.
+
+      scrapeTimeout: # podMonitor.relabelings -- [RelabelConfigs](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config)
+
+      # to apply to samples before scraping.
+      relabelings: []
+      # podMonitor.metricRelabelings -- [MetricRelabelConfigs](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#metric_relabel_configs)
+      # to apply to samples before ingestion.
+      metricRelabelings: []
+      # podMonitor.podTargetLabels -- [podTargetLabels](https://prometheus-operator.dev/docs/operator/api/#monitoring.coreos.com/v1.PodMonitorSpec)
+      # transfers labels on the Kubernetes Pod onto the target.
+      podTargetLabels: []
+      # podMonitor.additionalLabels -- Adds additional labels to the PodMonitor.
+      additionalLabels: {}
+      # podMonitor.honorLabels -- If true, honor_labels is set to true in the [scrape config](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config).
+      honorLabels: false
+      # podMonitor.honorTimestamps -- If true, honor_timestamps is set to true in the [scrape config](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config).
+      honorTimestamps: true
+
+    # Log level for Vector. trace, debug, info, warn, error, off
+    logLevel: "info"
