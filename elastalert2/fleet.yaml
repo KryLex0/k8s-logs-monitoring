@@ -90,7 +90,7 @@ helm:
 
     elasticsearch:
       # elasticsearch endpoint e.g. (svc.namespace||svc)
-      host: elasticsearch-es-default.elastic-system.svc
+      host: elasticsearch-es-default
       # elasticsearch port
       port: 9200
       # whether or not to connect to es_host using TLS
