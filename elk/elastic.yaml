@@ -26,10 +26,10 @@ spec:
         - name: elasticsearch
           resources:
             limits:
-              cpu: 4
+              cpu: '4'
               memory: 5Gi
             requests:
-              cpu: 2
+              cpu: '2'
               memory: 2Gi
     volumeClaimTemplates:
     - metadata:
