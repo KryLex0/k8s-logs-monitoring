@@ -204,7 +204,8 @@ helm:
           inputs:
           - processed_logs
           condition:
-            vrl: .is_probant == true
+            type: vrl
+            source: .is_probant == true
 
       sinks:
         elastic:
