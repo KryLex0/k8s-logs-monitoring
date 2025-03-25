@@ -86,7 +86,23 @@ helm:
       value: "elastic"
     - name: ES_PASSWORD
       value: "eSFZ387hx0a94m96B7LcH0AF"
-    # podAnnotations -- Set annotations on Vector Pods.
+    - name: AWS_ACCESS_KEY_ID
+      valueFrom:
+        secretKeyRef:
+          name: vector-aws-s3
+          key: aws_access_key_id
+    - name: AWS_SECRET_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: vector-aws-s3
+          key: aws_secret_access_key
+    - name: AWS_REGION
+      valueFrom:
+        secretKeyRef:
+          name: vector-aws-s3
+          key: aws_region
+
+    -  # podAnnotations -- Set annotations on Vector Pods.
     podAnnotations: {}
 
     # podLabels -- Set labels on Vector Pods.
@@ -237,6 +253,17 @@ helm:
           encoding:
             codec: json
 
+        osc_s3:
+          type: aws_s3
+          inputs:
+          - filtered_processed_logs
+          bucket: "vector-logs"
+          auth:
+            access_key_id: "${AWS_ACCESS_KEY_ID}"
+            secret_access_key: "${AWS_SECRET_ACCESS_KEY}"
+            region: "${AWS_REGION}"
+
+          endpoint: "https://oos.eu-west-2.outscale.com/"
         # ### Original logs (not processed)
         # stdout:
         #   type: console
