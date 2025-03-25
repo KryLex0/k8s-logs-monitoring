@@ -101,7 +101,6 @@ helm:
         secretKeyRef:
           name: vector-aws-s3
           key: aws_region
-
     # podAnnotations -- Set annotations on Vector Pods.
     podAnnotations: {}
 
@@ -258,6 +257,8 @@ helm:
           inputs:
           - filtered_processed_logs
           bucket: "vector-logs"
+          encoding:
+            codec: json
           auth:
             access_key_id: "${AWS_ACCESS_KEY_ID}"
             secret_access_key: "${AWS_SECRET_ACCESS_KEY}"
