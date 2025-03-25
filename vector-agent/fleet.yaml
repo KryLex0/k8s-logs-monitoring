@@ -237,10 +237,27 @@ helm:
           encoding:
             codec: json
 
+        # ### Original logs (not processed)
+        # stdout:
+        #   type: console
+        #   inputs:
+        #   - k8s
+        #   target: stdout
+        #   encoding:
+        #     codec: raw_message
+        # ### Processed logs (All fields parsed)
+        # stdout:
+        #   type: console
+        #   inputs:
+        #   - processed_logs
+        #   target: stdout
+        #   encoding:
+        #     codec: raw_message
+        ### Filtered logs (Only probant logs)
         stdout:
           type: console
           inputs:
-          - k8s
+          - filtered_processed_logs
           target: stdout
           encoding:
             codec: raw_message
