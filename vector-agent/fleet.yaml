@@ -263,7 +263,7 @@ helm:
             secret_access_key: "${AWS_SECRET_ACCESS_KEY}"
             region: "${AWS_REGION}"
 
-          endpoint: "https://oos.eu-west-2.outscale.com/"
+          endpoint: "http://minio.minio:9000" # For local storage
         # ### Original logs (not processed)
         # stdout:
         #   type: console
