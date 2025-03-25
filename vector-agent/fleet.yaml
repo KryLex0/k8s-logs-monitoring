@@ -198,6 +198,14 @@ helm:
               }
               .has_stack = true
             }
+
+        filtered_processed_logs:
+          type: filter
+          inputs:
+          - processed_logs
+          condition:
+            vrl: .is_probant == true
+
       sinks:
         elastic:
           type: elasticsearch
@@ -223,15 +231,9 @@ helm:
         file:
           type: file
           inputs:
-          - processed_logs
-          path: "/tmp/vector_probant.log"
+          - filtered_processed_logs
           encoding:
             codec: json
-          condition:
-            type: "check_fields"
-            fields:
-            - key: ".is_probant"
-          value: true
 
         stdout:
           type: console
