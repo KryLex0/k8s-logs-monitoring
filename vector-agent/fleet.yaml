@@ -193,6 +193,9 @@ helm:
 
                 .message = merge!(.message, new_fields)
               }
+              if .message.stack_0.flag == "PROBANT"{
+                .is_probant = true
+              }
               .has_stack = true
             }
       sinks:
@@ -216,6 +219,19 @@ helm:
             index: "k8s-logs-%Y-%m-%d"
             action: "index"
           compression: gzip
+
+        file:
+          type: file
+          inputs:
+          - processed_logs
+          path: "/tmp/vector_probant.log"
+          encoding:
+            codec: json
+          condition:
+            type: "check_fields"
+            fields:
+            - key: ".is_probant"
+          value: true
 
         stdout:
           type: console
