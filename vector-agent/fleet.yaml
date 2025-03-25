@@ -232,6 +232,7 @@ helm:
           type: file
           inputs:
           - filtered_processed_logs
+          path: "/tmp/vector_probant.log"
           encoding:
             codec: json
 
