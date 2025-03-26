@@ -271,7 +271,7 @@ helm:
           endpoint: "http://minio.minio:9000" # For local storage
           compression: gzip
           key_prefix: "%F_"
-          filename_time_format: "%H-%M-%S.%L"
+          filename_time_format: "%H-%M-%S"
           timezone: "Europe/Paris"
 
         # ### Original logs (not processed)
