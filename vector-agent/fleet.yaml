@@ -211,7 +211,24 @@ helm:
               if .message.stack_0.flag == "PROBANT"{
                 .is_probant = true
               }
+
+              if exists(.message.stack_0.status) {
+                .alert.status = .message.stack_0.status
+              }
+              if exists(.message.stack_0.flag) {
+                .alert.flag = .message.stack_0.flag
+              }
+
               .has_stack = true
+            }
+
+            if exists(.message.context) {
+              if exists(.message.context.status) {
+                .alert.status = .message.context.status
+              }
+              if exists(.message.context.flag) {
+                .alert.flag = .message.context.flag
+              }
             }
 
         filtered_processed_logs:
