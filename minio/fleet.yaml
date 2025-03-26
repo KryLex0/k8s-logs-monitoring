@@ -24,6 +24,9 @@ helm:
   timeoutSeconds: 0
   # # Custom values that will be passed as values.yaml to the installation
   values:
+    resources:
+    requests:
+      memory: 6Gi
     replicas: 1
     mode: standalone
     persistence:
