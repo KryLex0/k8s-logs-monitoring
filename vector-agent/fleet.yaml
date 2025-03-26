@@ -243,6 +243,7 @@ helm:
             index: "k8s-logs-%Y-%m-%d"
             action: "index"
           compression: gzip
+          timezone: "Europe/Paris"
 
         # file:
         #   type: file
@@ -270,6 +271,9 @@ helm:
             region: "${AWS_REGION}"
           endpoint: "http://minio.minio:9000" # For local storage
           compression: gzip
+          key_prefix: "%F_"
+          filename_time_format: "%H-%M-%S.%L"
+          timezone: "Europe/Paris"
 
         # ### Original logs (not processed)
         # stdout:
@@ -295,6 +299,7 @@ helm:
           target: stdout
           encoding:
             codec: raw_message
+          timezone: "Europe/Paris"
 
     # defaultVolumes -- Default volumes that are mounted into pods. In most cases, these should not be changed.
     # Use `extraVolumes`/`extraVolumeMounts` for additional custom volumes.
