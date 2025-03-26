@@ -243,7 +243,6 @@ helm:
             index: "k8s-logs-%Y-%m-%d"
             action: "index"
           compression: gzip
-          timezone: "Europe/Paris"
 
         # file:
         #   type: file
