@@ -244,13 +244,16 @@ helm:
             action: "index"
           compression: gzip
 
-        file:
-          type: file
-          inputs:
-          - filtered_processed_logs
-          path: "/tmp/vector_probant.log"
-          encoding:
-            codec: json
+        # file:
+        #   type: file
+        #   inputs:
+        #   - filtered_processed_logs
+        #   path: "/tmp/vector_probant.log"
+        #   encoding:
+        #     codec: json
+        #     json:
+        #       pretty: true
+        #   compression: gzip
 
         osc_s3:
           type: aws_s3
@@ -259,12 +262,15 @@ helm:
           bucket: "vector-logs"
           encoding:
             codec: json
+            json:
+              pretty: true
           auth:
             access_key_id: "${AWS_ACCESS_KEY_ID}"
             secret_access_key: "${AWS_SECRET_ACCESS_KEY}"
             region: "${AWS_REGION}"
-
           endpoint: "http://minio.minio:9000" # For local storage
+          compression: gzip
+
         # ### Original logs (not processed)
         # stdout:
         #   type: console
