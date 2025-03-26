@@ -299,7 +299,6 @@ helm:
           target: stdout
           encoding:
             codec: raw_message
-          timezone: "Europe/Paris"
 
     # defaultVolumes -- Default volumes that are mounted into pods. In most cases, these should not be changed.
     # Use `extraVolumes`/`extraVolumeMounts` for additional custom volumes.
