@@ -302,7 +302,7 @@ helm:
             region: "${AWS_REGION}"
           endpoint: "${AWS_ENDPOINT}"
           compression: gzip
-          key_prefix: "%F_"
+          key_prefix: "%F/"
           filename_time_format: "%H-%M-%S"
           # filename_extension: "log.gz"
           timezone: "Europe/Paris"
