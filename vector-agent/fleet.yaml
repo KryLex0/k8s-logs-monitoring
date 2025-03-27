@@ -232,7 +232,8 @@ helm:
               if exists(.message.stack_0.flag) {
                 .alert_flag = .message.stack_0.flag
               }
-
+              # Set the stack object as a string to avoid error when elastic ingest the data as a text (instead of nested object)
+              .message.stack = encode_json(.message.stack)
               .has_stack = true
             }
 
