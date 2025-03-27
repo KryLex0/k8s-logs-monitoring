@@ -83,24 +83,41 @@ helm:
     #     # awsSecretAccessKey: "secret-access-key"
     env:
     - name: ES_USERNAME
-      value: "elastic"
+      valueFrom:
+        secretKeyRef:
+          name: vector-elastic
+          key: ES_USERNAME
     - name: ES_PASSWORD
-      value: "eSFZ387hx0a94m96B7LcH0AF"
+      valueFrom:
+        secretKeyRef:
+          name: vector-elastic
+          key: ES_PASSWORD
+
     - name: AWS_ACCESS_KEY_ID
       valueFrom:
         secretKeyRef:
           name: vector-aws-s3
-          key: aws_access_key_id
+          key: AWS_ACCESS_KEY_ID
     - name: AWS_SECRET_ACCESS_KEY
       valueFrom:
         secretKeyRef:
           name: vector-aws-s3
-          key: aws_secret_access_key
+          key: AWS_SECRET_ACCESS_KEY
     - name: AWS_REGION
       valueFrom:
         secretKeyRef:
           name: vector-aws-s3
-          key: aws_region
+          key: AWS_REGION
+    - name: AWS_ENDPOINT
+      valueFrom:
+        secretKeyRef:
+          name: vector-aws-s3
+          key: AWS_ENDPOINT
+    - name: AWS_BUCKET
+      valueFrom:
+        secretKeyRef:
+          name: vector-aws-s3
+          key: AWS_BUCKET
     # podAnnotations -- Set annotations on Vector Pods.
     podAnnotations: {}
 
@@ -208,9 +225,6 @@ helm:
 
                 .message = merge!(.message, new_fields)
               }
-              if .message.stack_0.flag == "PROBANT"{
-                .is_probant = true
-              }
 
               if exists(.message.stack_0.status) {
                 .alert_status = .message.stack_0.status
@@ -229,6 +243,7 @@ helm:
               if exists(.message.context.flag) {
                 .alert_flag = .message.context.flag
               }
+              .has_context = true
             }
 
         filtered_processed_logs:
@@ -237,7 +252,7 @@ helm:
           - processed_logs
           condition:
             type: vrl
-            source: .is_probant == true
+            source: .alert_flag == "PROBANT"
 
       sinks:
         elastic:
@@ -276,7 +291,7 @@ helm:
           type: aws_s3
           inputs:
           - filtered_processed_logs
-          bucket: "vector-logs"
+          bucket: "${AWS_BUCKET}"
           encoding:
             codec: json
             json:
@@ -285,7 +300,7 @@ helm:
             access_key_id: "${AWS_ACCESS_KEY_ID}"
             secret_access_key: "${AWS_SECRET_ACCESS_KEY}"
             region: "${AWS_REGION}"
-          endpoint: "http://minio.minio:9000" # For local storage
+          endpoint: "${AWS_ENDPOINT}"
           compression: gzip
           key_prefix: "%F_"
           filename_time_format: "%H-%M-%S_"

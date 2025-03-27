@@ -9,6 +9,7 @@ ssh ccm-master-cluster -L 8443:localhost:443 -L 9001:10.42.3.6:9001
 
 
 ## Restart cluster
+https://github.com/rancher/rke2/discussions/4107
 
 ```bash
 systemctl stop rke2-server
